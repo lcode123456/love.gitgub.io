@@ -1,3 +1,213 @@
-<script>
-	window.location.href="http://101.43.187.69"
-</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>给宝儿的满屏爱心</title>
+    <style>
+      html,
+      body {
+        margin: 0px;
+        padding: 0px;
+        background-color: #312;
+        font-family: sans-serif;
+        font-size: 48px;
+        overflow: hidden;
+      }
+
+      #logo {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+      }
+
+      p {
+        color: #aeb7c0;
+      }
+      canvas {
+        background-color: #312;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <canvas id="testCanvas" width="550" height="500"></canvas>
+    </div>
+    <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
+    <script>
+      var canvas;
+      var stage;
+      var container;
+      var captureContainers;
+      var captureIndex;
+
+      function init() {
+        // create a new stage and point it at our canvas:
+        canvas = document.getElementById("testCanvas");
+        // 创建stage
+        stage = new createjs.Stage(canvas);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var w = canvas.width;
+        var h = canvas.height;
+
+        container = new createjs.Container();
+        stage.addChild(container);
+
+        captureContainers = [];
+        captureIndex = 0;
+
+        // create a large number of slightly complex vector shapes, and give them random positions and velocities:
+        for (var i = 0; i < 100; i++) {
+          var heart = new createjs.Shape();
+          heart.graphics.beginFill(
+            createjs.Graphics.getHSL(
+              Math.random() * 30 - 45,
+              100,
+              50 + Math.random() * 30
+            )
+          );
+          heart.graphics
+            .moveTo(0, -12)
+            .curveTo(1, -20, 8, -20)
+            .curveTo(16, -20, 16, -10)
+            .curveTo(16, 0, 0, 12);
+          heart.graphics
+            .curveTo(-16, 0, -16, -10)
+            .curveTo(-16, -20, -8, -20)
+            .curveTo(-1, -20, 0, -12);
+          heart.y = -100;
+
+          container.addChild(heart);
+        }
+
+        // 创建文本对象
+		var text = new createjs.Text("the longer I'm with you\nthe more I love you", "bold 24px Arial", "#312");
+		text.textAlign = "center";
+		text.x = w / 2;
+		text.y = h / 2 - text.getMeasuredLineHeight();
+		text.mouseEnabled = true; // 允许文本对象响应鼠标事件
+		stage.addChild(text);
+
+		// 添加点击事件监听器
+		text.on("click", function() { 
+			window.location.href = "Mylove.html"; // 跳转到百度首页
+		});
+
+		
+        for (i = 0; i < 100; i++) {
+          var captureContainer = new createjs.Container();
+          captureContainer.cache(0, 0, w, h);
+          captureContainers.push(captureContainer);
+        }
+
+
+        (function () {
+            var a_idx = 0;
+            window.onclick = function (event) {
+                var a = new Array("❤我❤", "❤爱你❤", "❤宝儿❤", "❤一生❤", "❤一世❤");
+ 
+                var heart = document.createElement("b"); //创建b元素
+                heart.onselectstart = new Function('event.returnValue=false'); //防止拖动
+ 
+                document.body.appendChild(heart).innerHTML = a[a_idx]; //将b元素添加到页面上
+                a_idx = (a_idx + 1) % a.length;
+                heart.style.cssText = "position: fixed;left:-100%;"; //给p元素设置样式
+ 
+                var f = 16, // 字体大小
+                    x = event.clientX - f / 2, // 横坐标
+                    y = event.clientY - f, // 纵坐标
+                    c = randomColor(), // 随机颜色
+                    a = 1, // 透明度
+                    s = 1.2; // 放大缩小
+ 
+                var timer = setInterval(function () { //添加定时器
+                    if (a <= 0) {
+                        document.body.removeChild(heart);
+                        clearInterval(timer);
+                    } else {
+                        heart.style.cssText = "font-size:16px;cursor: default;position: fixed;color:" +
+                            c + ";left:" + x + "px;top:" + y + "px;opacity:" + a + ";transform:scale(" +
+                            s + ");";
+ 
+                        y--;
+                        a -= 0.016;
+                        s += 0.002;
+                    }
+                }, 15)
+ 
+            }
+            // 随机颜色
+            function randomColor() {
+  var minRed = 200; // Minimum red value (adjust as needed)
+  var maxRed = 255; // Maximum red value (adjust as needed)
+  var minGreen = 0; // Minimum green value
+  var maxGreen = 100; // Maximum green value
+  var minBlue = 100; // Minimum blue value
+  var maxBlue = 200; // Maximum blue value
+
+  var red = Math.floor(Math.random() * (maxRed - minRed + 1)) + minRed;
+  var green = Math.floor(Math.random() * (maxGreen - minGreen + 1)) + minGreen;
+  var blue = Math.floor(Math.random() * (maxBlue - minBlue + 1)) + minBlue;
+
+  return "rgb(" + red + "," + green + "," + blue + ")";
+}
+        }());
+
+        // start the tick and point it at the window so we can do some work before updating the stage:
+        createjs.Ticker.timingMode = createjs.Ticker.RAF;
+        createjs.Ticker.on("tick", tick);
+		
+			
+		
+      }
+
+
+
+      function tick(event) {
+        var w = canvas.width;
+        var h = canvas.height;
+        var l = container.numChildren;
+
+        captureIndex = (captureIndex + 1) % captureContainers.length;
+        stage.removeChildAt(0);
+        var captureContainer = captureContainers[captureIndex];
+        stage.addChildAt(captureContainer, 0);
+        captureContainer.addChild(container);
+
+        // iterate through all the children and move them according to their velocity:
+        for (var i = 0; i < l; i++) {
+          var heart = container.getChildAt(i);
+          if (heart.y < -50) {
+            heart._x = Math.random() * w;
+            heart.y = h * (1 + Math.random()) + 50;
+            heart.perX = (1 + Math.random() * 2) * h;
+            heart.offX = Math.random() * h;
+            heart.ampX = heart.perX * 0.1 * (0.15 + Math.random());
+            heart.velY = -Math.random() * 2 - 1;
+            heart.scaleX = heart.scaleY = Math.random() * 2 + 1;
+            heart._rotation = Math.random() * 40 - 20;
+            heart.alpha = Math.random() * 0.75 + 0.05;
+            heart.compositeOperation =
+              Math.random() < 0.33 ? "lighter" : "source-over";
+          }
+          var int = ((heart.offX + heart.y) / heart.perX) * Math.PI * 2;
+          heart.y += (heart.velY * heart.scaleX) / 2;
+          heart.x = heart._x + Math.cos(int) * heart.ampX;
+          heart.rotation = heart._rotation + Math.sin(int) * 30;
+        }
+
+        captureContainer.updateCache("source-over");
+
+        // draw the updates to stage:
+        // 将更新绘制到舞台
+        stage.update(event);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
